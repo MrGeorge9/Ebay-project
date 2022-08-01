@@ -8,6 +8,7 @@
         public string PhotoURL { get; set; }
         public int Price { get; set; }
 
-        public User User { get; set; }  
+        public User User { get; set; }
+        public int UserId { get; set; }
     }
 }

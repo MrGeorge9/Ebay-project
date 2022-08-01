@@ -6,7 +6,6 @@
         public string Name { get; set; }
         public string Password { get; set; }
 
-        public Item Item { get; set; }
-        public int ItemId { get; set; }
+        public List<Item> Items { get; set; }       
     }
 }
