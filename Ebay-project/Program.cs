@@ -1,6 +1,14 @@
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
+var logger = new LoggerConfiguration()
+  .ReadFrom.Configuration(builder.Configuration)
+  .Enrich.FromLogContext()
+  .CreateLogger();
 
 // Add services to the container.
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
