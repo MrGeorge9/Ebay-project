@@ -19,6 +19,15 @@ namespace Ebay_project.Context
                 .WithOne(b => b.User)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            User user = new User()
+            {
+                Id = 1,
+                Name = "George",
+                Password = "Uhorka",
+                Role = "Admin"
+            };
+            modelBuilder.Entity<User>().HasData(user);
         }
     }
 }

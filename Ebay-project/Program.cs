@@ -1,10 +1,15 @@
 using Ebay_project.Context;
+using Ebay_project.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+MapSecretsToEnvVariables();
 var logger = new LoggerConfiguration()
   .ReadFrom.Configuration(builder.Configuration)
   .Enrich.FromLogContext()
@@ -27,6 +32,19 @@ if (env != null && env.Equals("Production"))
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("TokenGenerationKey")))
+        };
+    });
+builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 
@@ -43,10 +61,21 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints => endpoints.MapControllers());
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+static void MapSecretsToEnvVariables()
+{
+    var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+    foreach (var child in config.GetChildren())
+    {
+        Environment.SetEnvironmentVariable(child.Key, child.Value);
+    }
+}
