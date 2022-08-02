@@ -7,6 +7,7 @@ namespace Ebay_project.Services
     {
         string Login(UserLogin userLogin);     
         User Authenticate(UserLogin userLogin);     
-        string GenerateToken(User user);        
+        string GenerateToken(User user);
+        User ReadUser(IEnumerable<System.Security.Claims.Claim> userClaims);
     }
 }

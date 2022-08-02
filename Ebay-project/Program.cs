@@ -1,4 +1,5 @@
 using Ebay_project.Context;
+using Ebay_project.Models;
 using Ebay_project.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
@@ -11,8 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 MapSecretsToEnvVariables();
 var logger = new LoggerConfiguration()
-  .ReadFrom.Configuration(builder.Configuration)
-  .Enrich.FromLogContext()
+  .ReadFrom.Configuration(builder.Configuration)  
   .CreateLogger();
 
 if (env != null && env.Equals("Development"))
@@ -69,6 +69,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+FillDatabaseIfEmpty(app);
+
 app.Run();
 
 static void MapSecretsToEnvVariables()
@@ -77,5 +79,31 @@ static void MapSecretsToEnvVariables()
     foreach (var child in config.GetChildren())
     {
         Environment.SetEnvironmentVariable(child.Key, child.Value);
+    }
+}
+
+static void FillDatabaseIfEmpty(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationContext>();    
+    
+    if (db.Users.IsNullOrEmpty())
+    {
+        User user = new User()
+        {
+            Name = "George",
+            Password = "Uhorka",
+            Role = "Admin"
+        };
+
+        User user2 = new User()
+        {
+            Name = "James",
+            Password = "Salama",
+            Role = "Buyer"
+        };
+        db.Users.Add(user);
+        db.Users.Add(user2);
+        db.SaveChanges();
     }
 }

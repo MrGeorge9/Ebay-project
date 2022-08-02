@@ -3,6 +3,7 @@ using Ebay_project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ebay_project.Controllers
 {
@@ -24,6 +25,22 @@ namespace Ebay_project.Controllers
             var response = _userService.Login(userLogin);
 
             if (response == string.Empty)
+            {
+                return NotFound("User not found");
+            }
+            return Ok(response);
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpPost("sell")]
+        public IActionResult Login()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userClaims = identity.Claims;
+
+            var response = _userService.ReadUser(userClaims);
+
+            if (response == null)
             {
                 return NotFound("User not found");
             }

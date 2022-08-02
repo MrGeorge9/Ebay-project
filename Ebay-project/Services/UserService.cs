@@ -50,6 +50,7 @@ namespace Ebay_project.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(
@@ -60,6 +61,14 @@ namespace Ebay_project.Services
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public User ReadUser(IEnumerable<System.Security.Claims.Claim> userClaims)
+        {  
+            var userId = Int32.Parse(userClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier).Value);
+            var user = _db.Users.FirstOrDefault(p => p.Id == userId);
+
+            return user;
         }
     }
 }
