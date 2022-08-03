@@ -1,13 +1,14 @@
 ﻿using Ebay_project.Models;
 using Ebay_project.Models.DTOs;
+using System.Security.Claims;
 
 namespace Ebay_project.Services
 {
     public interface IUserService
     {
-        string Login(UserLogin userLogin);     
-        User Authenticate(UserLogin userLogin);     
-        string GenerateToken(User user);
-        User ReadUser(IEnumerable<System.Security.Claims.Claim> userClaims);
+        string Register(UserRegistrationDto userRegistration);
+        string Login(UserLoginDto userLogin);  
+        User ReadUser(IEnumerable<Claim> userClaims);
+        string CreateItem(User user, NewItemDto newItem);
     }
 }

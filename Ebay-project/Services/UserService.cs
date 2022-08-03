@@ -11,64 +11,130 @@ namespace Ebay_project.Services
     public class UserService : IUserService
     {
         private readonly ApplicationContext _db;
+        private readonly IAuthService _authService;
 
-        public UserService(ApplicationContext db)
+        public UserService(ApplicationContext db, IAuthService authService)
         {
             _db = db;
+            _authService = authService;
         }
 
-        public string Login(UserLogin userLogin)
+        public string Register(UserRegistrationDto userRegistration)
         {
-            var user = Authenticate(userLogin);
-            
-            if (user != null)
+            if (userRegistration.Name == string.Empty && userRegistration.Password == string.Empty)
             {
-                return GenerateToken(user);                
+                return "No data provided";
+            }
+            if (userRegistration.Name == string.Empty)
+            {
+                return "No name provided";
+            }
+            if (userRegistration.Password == string.Empty)
+            {
+                return "No pasword provided";
+            }
+            if (_db.Users.Any(p => p.Name.Equals(userRegistration.Name)))
+            {
+                return "Username already taken";
+            }
+            if (userRegistration.Password.Length < 8)
+            {
+                return "Password must be at least 8 characters long";
             }
 
-            return string.Empty;
-        }
-
-        public User Authenticate(UserLogin userLogin)
-        {
-            var currentUser = _db.Users.FirstOrDefault(p => p.Name.ToLower().Equals(userLogin.Name.ToLower()) && 
-                p.Password.Equals(userLogin.Password));
-
-            if (currentUser != null)
+            if (userRegistration.Password.All(p => Char.IsLetter(p)))
             {
-                return currentUser;
+                return "Password must contain at leat one special character";
             }
-            return null;
+
+            _db.Users.Add(new User() { Name = userRegistration.Name, Password = userRegistration.Password });
+            _db.SaveChanges();
+
+            return "New user has been created";
         }
 
-        public string GenerateToken(User user)
+        public string Login(UserLoginDto userLogin)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("TokenGenerationKey")));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
+            if (userLogin.Name == string.Empty && userLogin.Password == string.Empty)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+                return "No data provided";
+            }
+            if (userLogin.Name == string.Empty)
+            {
+                return "No name provided";
+            }
+            if (userLogin.Password == string.Empty)
+            {
+                return "No pasword provided";
+            }
 
-            var token = new JwtSecurityToken(
-                null,
-                null,
-                claims,
-                expires: DateTime.Now.AddMinutes(15),
-                signingCredentials: credentials);
+            var user = _db.Users.FirstOrDefault(p => p.Name.Equals(userLogin.Name));
+            if (user == null)
+            {
+                return "No such user";
+            }
+            if (!userLogin.Password.Equals(user.Password))
+            {
+                return "Password is incorrect";
+            }
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+            return _authService.GenerateToken(user) + "&" + user.Wallet;
+        }        
 
-        public User ReadUser(IEnumerable<System.Security.Claims.Claim> userClaims)
-        {  
+        public User ReadUser(IEnumerable<Claim> userClaims)
+        {
             var userId = Int32.Parse(userClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier).Value);
             var user = _db.Users.FirstOrDefault(p => p.Id == userId);
 
             return user;
+        }
+
+        public string CreateItem(User user, NewItemDto newItem)
+        {
+            if (newItem.Name == string.Empty && newItem.Description == string.Empty && newItem.PhotoUrl == string.Empty
+                && newItem.StartingPrice == 0 && newItem.PurchasePrice == 0)
+            {
+                return "No data provided";
+            }
+            if (newItem.Name == string.Empty)
+            {
+                return "No name provided";
+            }
+            if (newItem.Description == string.Empty)
+            {
+                return "No description provided";
+            }
+            if (newItem.PhotoUrl == string.Empty)
+            {
+                return "No photoURL provided";
+            }
+            if (newItem.StartingPrice <= 0)
+            {
+                return "Starting price can´t be less than 1";
+            }
+            if (newItem.PurchasePrice <= 0)
+            {
+                return "Purchase price can´t be less than 1";
+            }
+            if (!(newItem.PhotoUrl.EndsWith("jpg") || newItem.PhotoUrl.EndsWith("jpeg") || newItem.PhotoUrl.EndsWith("png")))
+            {
+                return "Photo URL is incorrect";
+            }
+
+            Item item = new Item()
+            {
+                Name = newItem.Name,
+                Description = newItem.Description,
+                PhotoURL = newItem.PhotoUrl,
+                StartPrice = newItem.StartingPrice,
+                PurchasePrice = newItem.PurchasePrice
+            };
+           
+            _db.Items.Add(item);
+            user.Items.Add(item);
+            _db.SaveChanges();
+
+            return "Item is created";
         }
     }
 }

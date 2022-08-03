@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 MapSecretsToEnvVariables();
 var logger = new LoggerConfiguration()
-  .ReadFrom.Configuration(builder.Configuration)  
+  .ReadFrom.Configuration(builder.Configuration)
   .CreateLogger();
 
 if (env != null && env.Equals("Development"))
@@ -45,6 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IAuthService, JwtService>();
 
 var app = builder.Build();
 
@@ -85,14 +86,15 @@ static void MapSecretsToEnvVariables()
 static void FillDatabaseIfEmpty(WebApplication app)
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationContext>();    
-    
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
     if (db.Users.IsNullOrEmpty())
     {
         User user = new User()
         {
             Name = "George",
             Password = "Uhorka",
+            Wallet = 1500,
             Role = "Admin"
         };
 
@@ -100,6 +102,7 @@ static void FillDatabaseIfEmpty(WebApplication app)
         {
             Name = "James",
             Password = "Salama",
+            Wallet = 220,
             Role = "Buyer"
         };
         db.Users.Add(user);
