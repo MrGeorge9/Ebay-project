@@ -63,8 +63,8 @@ namespace Ebay_project.Controllers
         }
         
         [Authorize(Roles = "Admin, Buyer")]
-        [HttpPost("createItem")]
-        public IActionResult createItem(NewItemDto newItem)
+        [HttpPost("create")]
+        public IActionResult CreateItem(NewItemDto newItem)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var userClaims = identity.Claims;
@@ -89,6 +89,36 @@ namespace Ebay_project.Controllers
                     return BadRequest(new ErrorDto(response));                
             }
             return Ok(new ItemCreationResponseDto(response, newItem));
+        }
+
+        [Authorize(Roles = "Admin, Buyer")]
+        [HttpPost("list")]
+        public IActionResult ListAvailableItems(ListAvailableDto listAvailable)
+        {            
+            var response = _userService.ListAvailableItems(listAvailable);            
+
+            switch (response[0].Name)
+            {
+                case "Selected page must be higher than 0":
+                    return BadRequest(new ErrorDto(response[0].Name));
+                case "This page is empty":
+                    return Ok(new StatusDto(response[0].Name));              
+            }          
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin, Buyer")]
+        [HttpPost("details")]
+        public IActionResult ItemDetails([FromHeader] int id)
+        {
+            var response = _userService.ItemDetails(id);
+
+            switch (response.Name)
+            {
+                case "No such item in the database":
+                    return BadRequest(new ErrorDto(response.Name));              
+            }
+            return Ok(response);
         }
     }
 }

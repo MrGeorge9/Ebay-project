@@ -7,6 +7,7 @@ namespace Ebay_project.Context
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Bid> Bids { get; set; }
 
         public ApplicationContext(DbContextOptions options) : base(options)
         {
@@ -18,7 +19,19 @@ namespace Ebay_project.Context
                 .HasMany(k => k.Items)
                 .WithOne(b => b.User)
                 .IsRequired(false)
-                .OnDelete(DeleteBehavior.Cascade);           
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Item>()
+                .HasMany(k => k.Bids)
+                .WithOne(b => b.Item)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                .HasMany(k => k.Bids)
+                .WithOne(b => b.User)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

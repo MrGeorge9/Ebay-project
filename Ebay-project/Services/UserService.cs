@@ -1,6 +1,7 @@
 ﻿using Ebay_project.Context;
 using Ebay_project.Models;
 using Ebay_project.Models.DTOs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -79,7 +80,7 @@ namespace Ebay_project.Services
             }
 
             return _authService.GenerateToken(user) + "&" + user.Wallet;
-        }        
+        }
 
         public User ReadUser(IEnumerable<Claim> userClaims)
         {
@@ -129,12 +130,85 @@ namespace Ebay_project.Services
                 StartPrice = newItem.StartingPrice,
                 PurchasePrice = newItem.PurchasePrice
             };
-           
+
             _db.Items.Add(item);
             user.Items.Add(item);
             _db.SaveChanges();
 
             return "Item is created";
+        }
+
+        public List<ListAvailableDtoResponse> ListAvailableItems(ListAvailableDto listAvailable)
+        {
+            List<Item> availableItems = new List<Item>();
+            List<ListAvailableDtoResponse> listAvailablesResponses = new List<ListAvailableDtoResponse>();
+
+            if (listAvailable.Page <= 0)
+            {
+                listAvailablesResponses.Add(new ListAvailableDtoResponse("Selected page must be higher than 0"));
+                return listAvailablesResponses;
+            }
+
+            var itemPosition = (listAvailable.Page - 1) * 20;
+            var items = _db.Items.Include(p => p.Bids).Where(p => p.Sold == false).ToList();
+
+            if (items.Count > itemPosition + 20)
+            {
+                for (int i = itemPosition; i < itemPosition + 20; i++)
+                {
+                    availableItems.Add(items[i]);
+                }
+            }
+            else if (items.Count > itemPosition)
+            {
+                for (int i = itemPosition; i < items.Count(); i++)
+                {
+                    availableItems.Add(items[i]);
+                }
+            }
+
+            if (availableItems.Count == 0)
+            {
+                listAvailablesResponses.Add(new ListAvailableDtoResponse("This page is empty"));
+                return listAvailablesResponses;
+            }
+
+            for (int i = 0; i < availableItems.Count(); i++)
+            {
+                listAvailablesResponses.Add(new ListAvailableDtoResponse(
+                    availableItems[i].Name, 
+                    availableItems[i].PhotoURL, 
+                    availableItems[i].Bids.Count() == 0 ? 0 : availableItems[i].Bids.Last().Value));
+            }
+
+            return listAvailablesResponses;
+        }
+
+        public ItemDetailsDto ItemDetails(int id)
+        {
+            List<BidDto> bidDtos = new List<BidDto>();
+            var item = _db.Items.Include(p => p.Bids).Include(p => p.User).FirstOrDefault(p => p.Id == id);
+            if (item == null)
+            {
+                return new ItemDetailsDto("No such item in the database");
+            }
+            
+            for (int i = 0; i < item.Bids.Count(); i++)
+            {
+                var userId = item.Bids[i].UserId;
+                bidDtos.Add(new BidDto(item.Bids[i].Value, _db.Users.FirstOrDefault(p => p.Id == userId).Name));
+            }            
+            ItemDetailsDto itemDetailsDto = new ItemDetailsDto(
+                item.Name,
+                item.Description,
+                item.PhotoURL,
+                bidDtos,
+                item.PurchasePrice,
+                item.User.Name,
+                item.BuyersName
+                );
+
+            return itemDetailsDto;
         }
     }
 }

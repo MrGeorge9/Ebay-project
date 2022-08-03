@@ -10,5 +10,7 @@ namespace Ebay_project.Services
         string Login(UserLoginDto userLogin);  
         User ReadUser(IEnumerable<Claim> userClaims);
         string CreateItem(User user, NewItemDto newItem);
+        List<ListAvailableDtoResponse> ListAvailableItems(ListAvailableDto listAvailable);
+        ItemDetailsDto ItemDetails(int id);
     }
 }
