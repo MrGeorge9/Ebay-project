@@ -1,0 +1,35 @@
+name: Build and deploy ASP.Net Core app to Azure Web App - Ebay project
+
+on:
+  push: 
+    branches:
+    - production
+
+jobs:
+  build-and-deploy:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore ./Eucyon-Tribes/Eucyon-Tribes.sln
+      
+    - name: Build & Publish
+      run: dotnet build --configuration Release ./Ebay-project/Ebay-project.sln
+      
+    - name: dotnet publish
+      run: dotnet publish ./Ebay-project/Ebay-project.csproj -c Release -o './Ebay-project'
+      
+    - name: 'Deploy to Azure WebApp'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: Eucyon-Tribes
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C49066A210F04ADAB148FCD7B78D85C4 }}
+        package: './Ebay-project'
