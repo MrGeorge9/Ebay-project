@@ -1,4 +1,5 @@
 ﻿using Ebay_project.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ebay_project.Services
 {
@@ -32,13 +33,14 @@ namespace Ebay_project.Services
 
         public string DeleteUser(int userId)
         {
-            var user = _db.Users.FirstOrDefault(p => p.Id == userId);
+            var user = _db.Users.Include(p => p.Bids).FirstOrDefault(p => p.Id == userId);
             if (user == null)
             {
                 return "No such user";
             }
 
-            _db.Users.Remove(user);
+            _db.Bids.RemoveRange(user.Bids);
+            _db.Users.Remove(user);            
             _db.SaveChanges();
             return "User has been removed";
         }
