@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 6.x.x
         
     - name: Restore dependencies
       run: dotnet restore ./Ebay-project/Ebay-project.sln
@@ -30,6 +30,6 @@ jobs:
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
-        app-name: Eucyon-Tribes
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C49066A210F04ADAB148FCD7B78D85C4 }}
+        app-name: NewEbayProject
+        publish-profile: ${{ secrets.AZURE }}
         package: './Ebay-project'
