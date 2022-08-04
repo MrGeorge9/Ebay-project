@@ -31,5 +31,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: Ebay-project
-        publish-profile: ${{ secrets.AZURE }}
+        publish-profile: ${{ AZUREAPPSERVICE_PUBLISHPROFILE_C49066A210F04ADAB148FCD7B78D85C4 }}
         package: './Ebay-project'
