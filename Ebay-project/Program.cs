@@ -45,8 +45,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("TokenGenerationKey")))
         };
     });
-builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IBuyerService, BuyerService>();
+builder.Services.AddTransient<IAdminService, AdminService>();
 builder.Services.AddTransient<IAuthService, JwtService>();
+builder.Services.AddTransient<IPublicService, PublicService>();
 
 var app = builder.Build();
 

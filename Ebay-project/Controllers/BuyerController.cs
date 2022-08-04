@@ -1,75 +1,32 @@
 ﻿using Ebay_project.Models.DTOs;
 using Ebay_project.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Ebay_project.Controllers
 {
+    [Authorize(Roles = "Admin, Buyer")]
     [Route("api")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class BuyerController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IBuyerService _buyerService;
+        private readonly IAuthService _authService;
 
-        public UserController(IUserService userService)
+        public BuyerController(IBuyerService buyerService, IAuthService authService)
         {
-            _userService = userService;
+            _buyerService = buyerService;
+            _authService = authService;
         }
 
-        [HttpPost("register")]
-        public IActionResult Register(UserRegistrationDto userRegistration)
-        {
-            var response = _userService.Register(userRegistration);
-
-            switch (response)
-            {
-                case "No data provided":
-                    return BadRequest(new ErrorDto(response));
-                case "No name provided":
-                    return BadRequest(new ErrorDto(response));
-                case "No pasword provided":
-                    return BadRequest(new ErrorDto(response));
-                case "Username already taken":
-                    return BadRequest(new ErrorDto(response));
-                case "Password must be at least 8 characters long":
-                    return BadRequest(new ErrorDto(response));
-                case "Password must contain at leat one special character":
-                    return BadRequest(new ErrorDto(response));               
-            }
-            return Ok(new StatusDto(response));
-        }
-
-        [HttpPost("login")]
-        public IActionResult Login(UserLoginDto userLogin)
-        {
-            var response = _userService.Login(userLogin);
-
-            switch (response)
-            {
-                case "No data provided":
-                    return BadRequest(new ErrorDto(response));
-                case "No name provided":
-                    return BadRequest(new ErrorDto(response));
-                case "No pasword provided":
-                    return BadRequest(new ErrorDto(response));
-                case "No such user":
-                    return BadRequest(new ErrorDto(response));
-                case "Password is incorrect":
-                    return BadRequest(new ErrorDto(response));                
-            }
-            return Ok(new LoginResponseDto(response.Split("&")[0], Int32.Parse(response.Split("&")[1])));
-        }
-        
-        [Authorize(Roles = "Admin, Buyer")]
         [HttpPost("create")]
         public IActionResult CreateItem(NewItemDto newItem)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var userClaims = identity.Claims;
-            var user = _userService.ReadUser(userClaims);
-            var response = _userService.CreateItem(user, newItem);
+            var user = _authService.ReturnUserFromToken(userClaims);
+            var response = _buyerService.CreateItem(user, newItem);
 
             switch (response)
             {
@@ -90,12 +47,11 @@ namespace Ebay_project.Controllers
             }
             return Ok(new ItemCreationResponseDto(response, newItem));
         }
-
-        [Authorize(Roles = "Admin, Buyer")]
+       
         [HttpPost("list")]
         public IActionResult ListAvailableItems(ListAvailableDto listAvailable)
         {            
-            var response = _userService.ListAvailableItems(listAvailable);            
+            var response = _buyerService.ListAvailableItems(listAvailable);            
 
             switch (response[0].Name)
             {
@@ -106,12 +62,11 @@ namespace Ebay_project.Controllers
             }          
             return Ok(response);
         }
-
-        [Authorize(Roles = "Admin, Buyer")]
+      
         [HttpPost("details")]
         public IActionResult ItemDetails([FromHeader] int id)
         {
-            var response = _userService.ItemDetails(id);
+            var response = _buyerService.ItemDetails(id);
 
             switch (response.Name)
             {
@@ -120,15 +75,14 @@ namespace Ebay_project.Controllers
             }
             return Ok(response);
         }
-
-        [Authorize(Roles = "Admin, Buyer")]
+      
         [HttpPost("bid")]
         public IActionResult BidOnItem([FromHeader] int id, [FromHeader] int bid)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var userClaims = identity.Claims;
-            var user = _userService.ReadUser(userClaims);
-            var response = _userService.BidOnItem(user, id, bid);
+            var user = _authService.ReturnUserFromToken(userClaims);
+            var response = _buyerService.BidOnItem(user, id, bid);
 
             switch (response.Name)
             {
@@ -144,6 +98,6 @@ namespace Ebay_project.Controllers
                     return BadRequest(new ErrorDto(response.Name));             
             }
             return Ok(response);
-        }
+        }       
     }
 }
