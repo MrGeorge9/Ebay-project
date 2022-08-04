@@ -31,5 +31,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: Eucyon-Tribes
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C49066A210F04ADAB148FCD7B78D85C4 }}
+        publish-profile: ${{ secrets.AZURE }}
         package: './Ebay-project'
