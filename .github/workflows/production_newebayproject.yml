@@ -30,6 +30,6 @@ jobs:
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
-        app-name: Eucyon-Tribes
+        app-name: Ebay-project
         publish-profile: ${{ secrets.AZURE }}
         package: './Ebay-project'
