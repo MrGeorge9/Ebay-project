@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 6.0.x
         
     - name: Restore dependencies
-      run: dotnet restore ./Eucyon-Tribes/Eucyon-Tribes.sln
+      run: dotnet restore ./Ebay-project/Ebay-project.sln
       
     - name: Build & Publish
       run: dotnet build --configuration Release ./Ebay-project/Ebay-project.sln
