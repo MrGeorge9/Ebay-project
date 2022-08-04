@@ -120,5 +120,30 @@ namespace Ebay_project.Controllers
             }
             return Ok(response);
         }
+
+        [Authorize(Roles = "Admin, Buyer")]
+        [HttpPost("bid")]
+        public IActionResult BidOnItem([FromHeader] int id, [FromHeader] int bid)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userClaims = identity.Claims;
+            var user = _userService.ReadUser(userClaims);
+            var response = _userService.BidOnItem(user, id, bid);
+
+            switch (response.Name)
+            {
+                case "No such item in the database":
+                    return BadRequest(new ErrorDto(response.Name));
+                case "User doesn´t have any money :(":
+                    return BadRequest(new ErrorDto(response.Name));
+                case "This item is already sold":
+                    return BadRequest(new ErrorDto(response.Name));
+                case "User has less money that the bid he wants to place":
+                    return BadRequest(new ErrorDto(response.Name));
+                case "The bid is lower than the last bid":
+                    return BadRequest(new ErrorDto(response.Name));             
+            }
+            return Ok(response);
+        }
     }
 }

@@ -24,13 +24,13 @@ namespace Ebay_project.Context
             modelBuilder.Entity<Item>()
                 .HasMany(k => k.Bids)
                 .WithOne(b => b.Item)
-                .IsRequired(false)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(k => k.Bids)
                 .WithOne(b => b.User)
-                .IsRequired(false)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

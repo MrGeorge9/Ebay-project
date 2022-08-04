@@ -176,8 +176,8 @@ namespace Ebay_project.Services
             for (int i = 0; i < availableItems.Count(); i++)
             {
                 listAvailablesResponses.Add(new ListAvailableDtoResponse(
-                    availableItems[i].Name, 
-                    availableItems[i].PhotoURL, 
+                    availableItems[i].Name,
+                    availableItems[i].PhotoURL,
                     availableItems[i].Bids.Count() == 0 ? 0 : availableItems[i].Bids.Last().Value));
             }
 
@@ -192,12 +192,12 @@ namespace Ebay_project.Services
             {
                 return new ItemDetailsDto("No such item in the database");
             }
-            
+
             for (int i = 0; i < item.Bids.Count(); i++)
             {
                 var userId = item.Bids[i].UserId;
                 bidDtos.Add(new BidDto(item.Bids[i].Value, _db.Users.FirstOrDefault(p => p.Id == userId).Name));
-            }            
+            }
             ItemDetailsDto itemDetailsDto = new ItemDetailsDto(
                 item.Name,
                 item.Description,
@@ -209,6 +209,72 @@ namespace Ebay_project.Services
                 );
 
             return itemDetailsDto;
+        }
+
+        public ItemDetailsDto BidOnItem(User user, int id, int bid)
+        {
+            List<BidDto> bidDtos = new List<BidDto>();
+            var item = _db.Items.Include(p => p.Bids).FirstOrDefault(p => p.Id == id);
+
+            if (item == null)
+            {
+                return new ItemDetailsDto("No such item in the database");
+            }
+
+            if (user.Wallet <= 0)
+            {
+                return new ItemDetailsDto("User doesn´t have any money :(");
+            }
+
+
+            if (item.Sold == true)
+            {
+                return new ItemDetailsDto("This item is already sold");
+            }
+
+            if (user.Wallet < bid)
+            {
+                return new ItemDetailsDto("User has less money that the bid he wants to place");
+            }
+
+            if (item.Bids.Count() > 0)
+            {
+                if (bid < item.Bids.Last().Value)
+                {
+                    return new ItemDetailsDto("The bid is lower than the last bid");
+                }
+            }
+
+            if (bid < item.PurchasePrice)
+            {
+                item.Bids.Add(new Bid() { Item = item, User = user, Value = bid });
+                _db.SaveChanges();
+            }
+            else
+            {
+                item.Bids.Add(new Bid() { Item = item, User = user, Value = bid });
+                item.Sold = true;
+                item.BuyersName = user.Name;
+                user.Wallet -= bid;
+                _db.SaveChanges();
+            }
+
+            for (int i = 0; i < item.Bids.Count(); i++)
+            {
+                var userId = item.Bids[i].UserId;
+                bidDtos.Add(new BidDto(item.Bids[i].Value, _db.Users.FirstOrDefault(p => p.Id == userId).Name));
+            }
+            ItemDetailsDto itemDetailsDto = new ItemDetailsDto(
+                item.Name,
+                item.Description,
+                item.PhotoURL,
+                bidDtos,
+                item.PurchasePrice,
+                item.User.Name,
+                item.BuyersName
+                );
+
+            return itemDetailsDto;          
         }
     }
 }
