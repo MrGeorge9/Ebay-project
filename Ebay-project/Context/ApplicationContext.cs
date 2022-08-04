@@ -16,10 +16,10 @@ namespace Ebay_project.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-                .HasMany(k => k.Items)
-                .WithOne(b => b.User)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Cascade);
+               .HasMany(k => k.Items)
+               .WithOne(b => b.User)
+               .IsRequired(false)
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
                 .HasMany(k => k.Bids)
