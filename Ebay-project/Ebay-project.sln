@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ebay-project", "Ebay-project.csproj", "{B90ACA27-F127-46A4-A82F-CDE61BFD1B1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebay,Tests", "..\Ebay,Tests\Ebay,Tests.csproj", "{A9A7F052-4141-41AE-9457-487FB5B239FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ebay-Tests", "..\Ebay,Tests\Ebay-Tests.csproj", "{A9A7F052-4141-41AE-9457-487FB5B239FA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B90ACA27-F127-46A4-A82F-CDE61BFD1B1F} = {B90ACA27-F127-46A4-A82F-CDE61BFD1B1F}
 	EndProjectSection
