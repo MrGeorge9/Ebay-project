@@ -18,19 +18,19 @@ namespace Ebay_project.Context
             modelBuilder.Entity<User>()
                .HasMany(k => k.Items)
                .WithOne(b => b.User)
-               .IsRequired()
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
                 .HasMany(k => k.Bids)
                 .WithOne(b => b.Item)
-                .IsRequired()
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(k => k.Bids)
                 .WithOne(b => b.User)
-                .IsRequired()
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

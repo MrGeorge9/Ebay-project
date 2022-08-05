@@ -10,10 +10,17 @@ namespace Ebay_project.Services
     public class JwtService : IAuthService
     {
         private readonly ApplicationContext _db;
+        private readonly IConfiguration _config;
 
-        public JwtService(ApplicationContext db)
+        public JwtService(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public JwtService(ApplicationContext db, IConfiguration config)
         {
             _db = db;
+            _config = config;
         }
 
 

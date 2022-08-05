@@ -125,4 +125,6 @@ Extensions.FillDatabaseIfEmpty(app);
 
 app.Run();
 
+public partial class Program { }
+
 
