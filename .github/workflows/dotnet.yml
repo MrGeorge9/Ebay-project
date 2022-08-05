@@ -25,5 +25,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore ./Ebay-project/Ebay-project.sln
       
-    - name: Test       
+    - name: Test 
+      env:
+          TokenGenerationKey: ${{ secrets.TokenGenerationKey }}
       run: dotnet test --no-build --verbosity normal ./Ebay-project
