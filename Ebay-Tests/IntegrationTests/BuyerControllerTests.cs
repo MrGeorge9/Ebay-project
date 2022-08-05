@@ -3,6 +3,8 @@ using System.Text.Json;
 
 namespace Ebay_Tests.IntegrationTests
 {
+    [Serializable]
+    [Collection("Serialize")]
     public class BuyerControllerTests : IntegrationTests
     {
         private User user;
