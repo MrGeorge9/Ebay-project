@@ -59,5 +59,14 @@ namespace Ebay_project.Controllers
             }
             return Ok(new LoginResponseDto(response.Split("&")[0], Int32.Parse(response.Split("&")[1])));
         }
+
+        [HttpGet("exception")]
+        public IActionResult Exception()
+        {
+            var list = new List<int>();
+            int a = list[1];
+            return null;
+        }
+
     }
 }

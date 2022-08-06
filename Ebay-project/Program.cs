@@ -106,6 +106,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.ConfigureExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints => endpoints.MapControllers());
@@ -124,5 +125,7 @@ app.UseSwaggerUI(options =>
 Extensions.FillDatabaseIfEmpty(app);
 
 app.Run();
+
+public partial class Program { }
 
 

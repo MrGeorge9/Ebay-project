@@ -75,15 +75,5 @@ namespace Ebay_project.Services
 
             return _authService.GenerateToken(user) + "&" + user.Wallet;
         }
-
-
-        public string DeleteItem(int id)
-        {
-            var bid = _db.Bids.FirstOrDefault(p => p.Id == id);
-
-            _db.Bids.Remove(bid);
-            _db.SaveChanges();
-            return "Item deleted";
-        }
     }
 }
