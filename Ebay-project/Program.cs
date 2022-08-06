@@ -106,6 +106,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.ConfigureExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints => endpoints.MapControllers());
