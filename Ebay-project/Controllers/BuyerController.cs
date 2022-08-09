@@ -20,7 +20,7 @@ namespace Ebay_project.Controllers
             _authService = authService;
         }
 
-        [HttpPost("create")]
+        [HttpPost("item")]
         public IActionResult CreateItem(NewItemDto newItem)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;

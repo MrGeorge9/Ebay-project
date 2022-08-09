@@ -17,7 +17,7 @@ namespace Ebay_project.Controllers
             _adminService = adminService;
         }
 
-        [HttpPost("fill")]
+        [HttpPost("wallet")]
         public IActionResult FillWalletOfUser([FromHeader] int userId, [FromHeader] int ammount)
         {
             var response = _adminService.FillWalletOfUser(userId, ammount);
@@ -32,7 +32,7 @@ namespace Ebay_project.Controllers
             return Ok(new StatusDto(response));
         }
 
-        [HttpPost("delete")]
+        [HttpDelete("user")]
         public IActionResult DeleteUser([FromHeader] int userId)
         {
             var response = _adminService.DeleteUser(userId);
