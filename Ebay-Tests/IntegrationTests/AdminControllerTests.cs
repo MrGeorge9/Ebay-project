@@ -29,7 +29,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("userId", "2");
             _client.DefaultRequestHeaders.Add("ammount", "500");           
 
-            var response = await _client.PostAsync("api/fill", null);
+            var response = await _client.PostAsync("api/wallet", null);
             var body = response.Content.ReadAsStringAsync().Result;
             var result = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
 
@@ -46,7 +46,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("userId", "2");
             _client.DefaultRequestHeaders.Add("ammount", "0");
 
-            var response = await _client.PostAsync("api/fill", null);
+            var response = await _client.PostAsync("api/wallet", null);
             var body = response.Content.ReadAsStringAsync().Result;
             var result = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
 
@@ -64,7 +64,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("userId", "2");
             _client.DefaultRequestHeaders.Add("ammount", "0");
 
-            var response = await _client.PostAsync("api/fill", null);            
+            var response = await _client.PostAsync("api/wallet", null);            
 
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);            
         }
@@ -72,7 +72,7 @@ namespace Ebay_Tests.IntegrationTests
         [Fact]
         public async Task FillWalletOfAUser_WithoutAuthentication_ReturnsUnAuthorized()
         {          
-            var response = await _client.PostAsync("api/fill", null);
+            var response = await _client.PostAsync("api/wallet", null);
 
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -85,7 +85,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
             _client.DefaultRequestHeaders.Add("userId", "2");            
 
-            var response = await _client.PostAsync("api/delete", null);
+            var response = await _client.DeleteAsync("api/user");
             var body = response.Content.ReadAsStringAsync().Result;
             var result = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
 
@@ -101,7 +101,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
             _client.DefaultRequestHeaders.Add("userId", "5");
 
-            var response = await _client.PostAsync("api/delete", null);
+            var response = await _client.DeleteAsync("api/user");
             var body = response.Content.ReadAsStringAsync().Result;
             var result = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
 
@@ -118,7 +118,7 @@ namespace Ebay_Tests.IntegrationTests
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
             _client.DefaultRequestHeaders.Add("userId", "2");            
 
-            var response = await _client.PostAsync("api/delete", null);
+            var response = await _client.DeleteAsync("api/user");
 
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -126,7 +126,7 @@ namespace Ebay_Tests.IntegrationTests
         [Fact]
         public async Task DeleteUser_WithoutAuthentication_ReturnsUnAuthorized()
         {
-            var response = await _client.PostAsync("api/delete", null);
+            var response = await _client.DeleteAsync("api/user");
 
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
